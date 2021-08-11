@@ -27,14 +27,17 @@
 
 name: Deploy to Amazon ECS
 
-# テスト用
-on: push
-# 後でこっちにする
-# on:
-#   push:
-#     branches: [ develop ]
-#   pull_request:
-#     branches: [ develop ]
+on:
+  push:
+    branches:
+      - develop
+      - main
+  workflow_dispatch:
+    inputs:
+      debug_enabled:
+        description: Run the build with tmate debugging enabled (https://github.com/marketplace/actions/debugging-with-tmate)
+        required: false
+        default: 'false'
 
 jobs:
   deploy:
@@ -83,6 +86,9 @@ jobs:
         container-name: web
         image: ${{ steps.build-web-image.outputs.image }}
 
+    - name: Setup tmate session
+      uses: mxschmitt/action-tmate@v3
+      if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.debug_enabled == 'true' }}
     # - name: Deploy Amazon ECS task definition
     #   uses: aws-actions/amazon-ecs-deploy-task-definition@v1
     #   with:
