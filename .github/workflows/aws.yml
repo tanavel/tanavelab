@@ -73,19 +73,40 @@ jobs:
 
         echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
 
+    - name: Build, tag, and push image to Amazon ECR(App)
+      id: build-app-image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: tanavel-prd-app-repo
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./docker/php
+
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+
+        echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+
     - name: Get current task definition
       id: get-task-def
       run: |
         aws ecs describe-task-definition --task-definition tanavel-prd-task-def --query \
         'taskDefinition.{containerDefinitions: containerDefinitions, family: family, volumes: volumes, placementConstraints: placementConstraints}' > task-def.json
 
-    - name: Fill in the new image ID in the Amazon ECS task definition
-      id: update-task-def
+    - name: Fill in the new image ID in the Amazon ECS task definition(Web)
+      id: update-web-task-def
       uses: aws-actions/amazon-ecs-render-task-definition@v1
       with:
         task-definition: task-def.json
         container-name: web
         image: ${{ steps.build-web-image.outputs.image }}
+
+    - name: Fill in the new image ID in the Amazon ECS task definition(App)
+      id: update-app-task-def
+      uses: aws-actions/amazon-ecs-render-task-definition@v1
+      with:
+        task-definition: task-def.json
+        container-name: app
+        image: ${{ steps.build-app-image.outputs.image }}
 
     - name: Deploy Amazon ECS task definition
       uses: aws-actions/amazon-ecs-deploy-task-definition@v1
