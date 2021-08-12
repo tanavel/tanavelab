@@ -76,7 +76,8 @@ jobs:
     - name: Get current task definition
       id: get-task-def
       run: |
-        aws ecs describe-task-definition --task-definition tanavel-prd-task-def > task-def.json
+        aws ecs describe-task-definition --task-definition tanavel-prd-task-def --query \
+        'taskDefinition' > task-def.json
 
     - name: Fill in the new image ID in the Amazon ECS task definition
       id: update-task-def
