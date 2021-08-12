@@ -79,22 +79,22 @@ jobs:
         aws ecs describe-task-definition --task-definition tanavel-prd-task-def --query taskDefinition > task-def.json
 
     - name: Fill in the new image ID in the Amazon ECS task definition
-      id: task-def
+      id: update-task-def
       uses: aws-actions/amazon-ecs-render-task-definition@v1
       with:
         task-definition: task-def.json
         container-name: web
         image: ${{ steps.build-web-image.outputs.image }}
 
+    - name: Deploy Amazon ECS task definition
+      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+      with:
+        task-definition: ${{ steps.update-task-def.outputs.task-definition }}
+        service: tanavel-prd-app-svc
+        cluster: tanavel-prd-ecs-cluster
+        wait-for-service-stability: true
+
     - name: Setup tmate session
       uses: mxschmitt/action-tmate@v3
       if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.debug_enabled == 'true' }}
       timeout-minutes: 15
-
-    # - name: Deploy Amazon ECS task definition
-    #   uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-    #   with:
-    #     task-definition: ${{ steps.task-def.outputs.task-definition }}
-    #     service: tanavel-prd-app-svc
-    #     cluster: tanavel-prd-ecs-cluster
-    #     wait-for-service-stability: true
