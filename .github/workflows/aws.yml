@@ -108,6 +108,11 @@ jobs:
         container-name: app
         image: ${{ steps.build-app-image.outputs.image }}
 
+    - name: Setup tmate session
+      uses: mxschmitt/action-tmate@v3
+      if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.debug_enabled == 'true' }}
+      timeout-minutes: 15
+
     - name: Deploy Amazon ECS task definition
       uses: aws-actions/amazon-ecs-deploy-task-definition@v1
       with:
@@ -115,8 +120,3 @@ jobs:
         service: tanavel-prd-app-svc
         cluster: tanavel-prd-ecs-cluster
         wait-for-service-stability: true
-
-    - name: Setup tmate session
-      uses: mxschmitt/action-tmate@v3
-      if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.debug_enabled == 'true' }}
-      timeout-minutes: 15
