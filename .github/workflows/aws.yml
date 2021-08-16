@@ -91,4 +91,3 @@ jobs:
         task-definition: ${{ steps.update-app-task-def.outputs.task-definition }}
         service: tanavel-prd-app-svc
         cluster: tanavel-prd-ecs-cluster
-        wait-for-service-stability: true
