@@ -1,30 +1,52 @@
 #!/usr/bin/env bash
-set -eux
+set -u
+
+#================================================#
+# Load .env
+#================================================#
+if [ -f .env ]; then
+  export $(grep -v '^#' .env | xargs)
+fi
 
 #================================================#
 # Check running DB process.
 #================================================#
-wget -qO- https://raw.githubusercontent.com/eficode/wait-for/v2.1.2/wait-for \
-| sh -s -- ${WORDPRESS_DB_HOST}:3306 -t 30
+result=1
+until [ ${result} -eq 0 ]; do
+    echo "Connecting DB ..."
+    nc -w 1 ${DB_HOST} 3306 > /dev/null 2>&1
+    result=$?
+    sleep 5
+done
+echo "Success connecting DB!!"
+
+#================================================#
+# Check composer install is finished.
+#================================================#
+until [ -e ./vendor/autoload.php ]; do
+    echo "Check composer install is finished ..."
+    sleep 5
+done
+echo "Success composer install!!"
 
 #================================================#
 # Install WP core.
 #================================================#
 wp core install \
---url=${WORDPRESS_URL} \
---title=${WORDPRESS_TITLE} \
---admin_user=${WORDPRESS_ADMIN_USER_NAME} \
---admin_password=${WORDPRESS_ADMIN_USER_PASSWORD} \
---admin_email=${WORDPRESS_ADMIN_USER_MAIL_ADDRESS}
+--url=${WP_URL} \
+--title=${WP_TITLE} \
+--admin_user=${WP_ADMIN_USER_NAME} \
+--admin_password=${WP_ADMIN_USER_PASSWORD} \
+--admin_email=${WP_ADMIN_USER_MAIL_ADDRESS}
 
 #================================================#
 # Language setting.
 #================================================#
-wp language core install ${WORDPRESS_LANGUAGE} --activate
+wp language core install ja --activate
 
 #================================================#
 # Time setting.
 #================================================#
-wp option update timezone_string ${WORDPRESS_TZ}
+wp option update timezone_string 'Asia/Tokyo'
 wp option update date_format 'Y-m-d'
 wp option update time_format 'H:i'
