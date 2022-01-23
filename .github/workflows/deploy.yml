@@ -3,6 +3,7 @@ name: Deploy to Amazon ECS
 on:
   push:
     branches:
+      - feature/8 # TODO: test用。あとで消す
       - develop
       - main
   workflow_dispatch:
@@ -10,7 +11,7 @@ on:
       debug_enabled:
         description: Run the build with tmate debugging enabled (https://github.com/marketplace/actions/debugging-with-tmate)
         required: false
-        default: 'false'
+        default: no
 
 jobs:
   deploy:
@@ -39,11 +40,17 @@ jobs:
         ECR_REPOSITORY: tanavel-prd-web-repo
         IMAGE_TAG: ${{ github.sha }}
       run: |
-        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./docker/nginx
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f ./docker/nginx/Dockerfile .
 
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
         echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '7.4'
+        tools: composer:v2
 
     - name: Build, tag, and push image to Amazon ECR(App)
       id: build-app-image
@@ -52,7 +59,9 @@ jobs:
         ECR_REPOSITORY: tanavel-prd-app-repo
         IMAGE_TAG: ${{ github.sha }}
       run: |
-        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./docker/php
+        composer install --no-dev --no-interaction -d ./src
+
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f ./docker/php/Dockerfile .
 
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
@@ -79,11 +88,6 @@ jobs:
         task-definition: ${{ steps.update-web-task-def.outputs.task-definition }}
         container-name: app
         image: ${{ steps.build-app-image.outputs.image }}
-
-    - name: Setup tmate session
-      uses: mxschmitt/action-tmate@v3
-      if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.debug_enabled == 'true' }}
-      timeout-minutes: 15
 
     - name: Deploy Amazon ECS task definition
       uses: aws-actions/amazon-ecs-deploy-task-definition@v1
