@@ -39,10 +39,10 @@ services:
         source: db_data
         target: /var/lib/mysql
     environment:
-      MYSQL_ROOT_PASSWORD: wordpress
-      MYSQL_USER: wordpress
-      MYSQL_PASSWORD: wordpress
-      MYSQL_DATABASE: wordpress
+      MYSQL_ROOT_PASSWORD: tanavelab
+      MYSQL_USER: tanavelab
+      MYSQL_PASSWORD: tanavelab
+      MYSQL_DATABASE: tanavelab
 
   cli:
     image: wordpress:cli-2.5
@@ -63,6 +63,7 @@ services:
       WP_ADMIN_USER_MAIL_ADDRESS: test@example.com
       WP_ADMIN_USER_NAME: admin
       WP_ADMIN_USER_PASSWORD: password
+      DB_HOST: db
     command: wp-setup.sh
 
   composer:
