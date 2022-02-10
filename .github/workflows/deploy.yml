@@ -70,7 +70,7 @@ jobs:
     - name: Get current task definition
       id: get-task-def
       run: |
-        aws ecs describe-task-definition --task-definition tanavel-prd-task-def --query \
+        aws ecs describe-task-definition --task-definition tanavel-prd-app-task-def --query \
         'taskDefinition.{containerDefinitions: containerDefinitions, family: family, volumes: volumes, placementConstraints: placementConstraints}' > task-def.json
 
     - name: Fill in the new image ID in the Amazon ECS task definition(Web)
