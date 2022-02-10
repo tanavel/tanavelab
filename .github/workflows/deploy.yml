@@ -19,6 +19,14 @@ jobs:
     runs-on: ubuntu-latest
     environment: prd
     steps:
+    # NOTE:
+    # - actを使ってローカルで検証したい時、Dockerイメージにaws cliが入っていない場合があるのでコメントアウトを外す
+    # - name: Install aws cli
+    #   run: |
+    #     curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+    #     unzip awscliv2.zip
+    #     sudo ./aws/install
+
     - name: Checkout
       uses: actions/checkout@v2
 
@@ -94,4 +102,4 @@ jobs:
       with:
         task-definition: ${{ steps.update-app-task-def.outputs.task-definition }}
         service: tanavel-prd-app-svc
-        cluster: tanavel-prd-ecs-cluster
+        cluster: tanavel-prd-app-cluster
