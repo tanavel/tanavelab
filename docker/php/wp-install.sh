@@ -41,11 +41,13 @@ wp core install \
 
 #================================================#
 # Language setting.
+# TODO: AWS環境では、翻訳ファイルはダウンロード済みの状態でbuildするから、必要なのはactivateだけかも
 #================================================#
 wp language core install ja --activate
 
 #================================================#
 # Time setting.
+# TODO: 絶対固定なのでフックとか使って固定させる方がええんやろな
 #================================================#
 wp option update timezone_string 'Asia/Tokyo'
 wp option update date_format 'Y-m-d'

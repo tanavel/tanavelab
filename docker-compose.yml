@@ -25,6 +25,7 @@ services:
     build:
       dockerfile: ./docker/php/Dockerfile
       context: .
+    working_dir: /var/www/tanavelab
     volumes:
       - type: bind
         source: ./src
@@ -45,18 +46,20 @@ services:
       MYSQL_DATABASE: tanavelab
 
   cli:
-    image: wordpress:cli-2.5
     depends_on:
       - app
       - db
+    build:
+      dockerfile: ./docker/php/Dockerfile
+      context: .
     working_dir: /var/www/tanavelab
     volumes:
       - type: bind
         source: ./src
         target: /var/www/tanavelab
       - type: bind
-        source: ./docker/wp-cli/wp-setup.sh
-        target: /usr/local/bin/wp-setup.sh
+        source: ./docker/php/wp-install.sh
+        target: /usr/local/bin/wp-install.sh
     environment:
       WP_URL: localhost:8080
       WP_TITLE: TanaveLab
@@ -64,7 +67,7 @@ services:
       WP_ADMIN_USER_NAME: admin
       WP_ADMIN_USER_PASSWORD: password
       DB_HOST: db
-    command: wp-setup.sh
+    command: wp-install.sh
 
   composer:
     image: composer:2
