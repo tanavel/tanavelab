@@ -87,4 +87,6 @@ COPY ./src /var/www/tanavelab
 
 COPY ./docker/php/php.ini /usr/local/etc/php/conf.d/php.ini
 
+WORKDIR /var/www/tanavelab
+
 CMD ["php-fpm"]

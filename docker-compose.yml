@@ -25,7 +25,6 @@ services:
     build:
       dockerfile: ./docker/php/Dockerfile
       context: .
-    working_dir: /var/www/tanavelab
     volumes:
       - type: bind
         source: ./src
@@ -52,7 +51,6 @@ services:
     build:
       dockerfile: ./docker/php/Dockerfile
       context: .
-    working_dir: /var/www/tanavelab
     volumes:
       - type: bind
         source: ./src
