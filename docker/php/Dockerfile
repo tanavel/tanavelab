@@ -1,5 +1,7 @@
 FROM php:7.4-fpm
 
+WORKDIR /var/www/tanavelab
+
 # persistent dependencies
 RUN set -eux; \
   apt-get update; \
@@ -86,7 +88,5 @@ COPY ./docker/php/wp-install.sh /usr/local/bin/wp-install.sh
 COPY ./src /var/www/tanavelab
 
 COPY ./docker/php/php.ini /usr/local/etc/php/conf.d/php.ini
-
-WORKDIR /var/www/tanavelab
 
 CMD ["php-fpm"]
