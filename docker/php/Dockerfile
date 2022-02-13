@@ -81,6 +81,8 @@ RUN set -eux; \
   chmod +x wp-cli.phar; \
   mv wp-cli.phar /usr/local/bin/wp
 
+COPY ./docker/php/wp-install.sh /usr/local/bin/wp-install.sh
+
 COPY ./src /var/www/tanavelab
 
 COPY ./docker/php/php.ini /usr/local/etc/php/conf.d/php.ini
