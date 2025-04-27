@@ -152,6 +152,15 @@ locationが複数ある場合、評価する順番がちょっと複雑なので
 
 ファイル名拡張子をレスポンスのMIMEタイプにマップする。
 
+#### index
+
+- Syntax: index file ...;
+- Default: index index.html;
+- Context: http, server, location
+
+indexとして使用されるファイルを指定  
+indexファイルを使用すると内部リダイレクトが発生する場合があるので注意
+
 #### fastcgi_pass
 
 - Syntax: fastcgi_pass address;
